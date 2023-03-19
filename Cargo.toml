@@ -11,3 +11,10 @@ bitvec = "1.0.1"
 generic-array = { version = "0.14.6", features = ["serde"] }
 lazy_static = "1.4.0"
 serde = { version = "1.0.157", features = ["derive"] }
+
+[dev-dependencies]
+criterion = "0.4.0"
+
+[[bench]]
+name = "ggm"
+harness = false
