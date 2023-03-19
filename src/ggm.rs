@@ -179,6 +179,15 @@ impl GgmRCPrfConstrainedKey {
         Some(node)
     }
 
+    pub fn evaluate_all(&self) -> GgmRCPrfIterator {
+        GgmRCPrfIterator {
+            ckey: self,
+            current_tree: 0,
+            stack: Vec::new(),
+            current: Some((self.node_prefixs[0].0, self.nodes[0])),
+        }
+    }
+
     fn search(&self, target: u64) -> Option<(u8, Node)> {
         let (mut low, mut high) = (0, self.node_prefixs.len());
 
@@ -204,6 +213,67 @@ impl GgmRCPrfConstrainedKey {
         }
 
         None
+    }
+}
+
+pub struct GgmRCPrfIterator<'a> {
+    ckey: &'a GgmRCPrfConstrainedKey,
+    current_tree: usize,
+    stack: Vec<(u8, Node)>,
+    current: Option<(u8, Node)>,
+}
+
+impl<'a> GgmRCPrfIterator<'a> {
+    fn next_in_one_tree(&mut self) -> Option<Output> {
+        while self.current.is_some() || !self.stack.is_empty() {
+            while let Some(mut node) = self.current {
+                self.stack.push(node);
+                if node.0 == 64 {
+                    self.current = None;
+                } else {
+                    node.0 += 1;
+                    step(&mut node.1, false);
+                    self.current = Some(node);
+                }
+            }
+            if let Some(mut node) = self.stack.pop() {
+                if node.0 == 64 {
+                    self.current = None;
+                    return Some(node.1);
+                } else {
+                    node.0 += 1;
+                    step(&mut node.1, true);
+                    self.current = Some(node);
+                };
+            }
+        }
+
+        None
+    }
+}
+
+impl<'a> Iterator for GgmRCPrfIterator<'a> {
+    type Item = Output;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(output) = self.next_in_one_tree() {
+            Some(output)
+        } else if self.current_tree < self.ckey.node_prefixs.len() - 1 {
+            self.current_tree += 1;
+            self.current = Some((
+                self.ckey.node_prefixs[self.current_tree].0,
+                self.ckey.nodes[self.current_tree],
+            ));
+            self.next()
+        } else {
+            None
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let size = (self.ckey.b - self.ckey.a + 1) as usize;
+
+        (size, Some(size))
     }
 }
 
