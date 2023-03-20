@@ -14,6 +14,7 @@ serde = { version = "1.0.157", features = ["derive"] }
 
 [dev-dependencies]
 criterion = "0.4.0"
+rand = "0.8.5"
 
 [[bench]]
 name = "ggm"
