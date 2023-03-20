@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, ops::Range};
+use std::{collections::VecDeque};
 
 use aes::{
     cipher::{BlockEncrypt, KeyInit},
@@ -39,8 +39,7 @@ impl GgmRCPrfMasterKey {
         node
     }
 
-    pub fn constrained(&self, range: Range<u64>) -> GgmRCPrfConstrainedKey {
-        let (a, b) = (range.start, range.end - 1);
+    pub fn constrained(&self, a: u64, b: u64) -> GgmRCPrfConstrainedKey {
         let (a_bits, b_bits) = (a.view_bits::<Msb0>(), b.view_bits::<Msb0>());
 
         let mut node_prefixs = VecDeque::with_capacity(2 * 64_usize);
