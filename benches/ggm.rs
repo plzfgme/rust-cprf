@@ -15,7 +15,7 @@ fn get_ck(range: Range<u64>) -> GgmRCPrfConstrainedKey {
 
 fn bench_ggm_evaluate_all(c: &mut Criterion) {
     let mut group = c.benchmark_group("GGM ck evaluate vs evaluate_all");
-    for i in [10u64, 100u64, 1000u64, 5000u64].iter() {
+    for i in (1000..=20000).step_by(1000) {
         group.bench_function(BenchmarkId::new("evalate for each", i), |b| {
             b.iter_batched(
                 || get_ck(2000..2000 + i + 1),
