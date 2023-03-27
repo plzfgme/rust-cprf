@@ -1,5 +1,3 @@
-
-
 use cprf::ggm::{GgmRCPrfConstrainedKey, GgmRCPrfMasterKey};
 use criterion::{black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
 use generic_array::GenericArray;
