@@ -28,13 +28,17 @@ pub struct Ggm64MasterKey {
 
 impl Ggm64MasterKey {
     pub fn new(key: [u8; GGM64_KEYSIZE]) -> Ggm64MasterKey {
-        Ggm64MasterKey { key: Ggm64Node::from(key) }
+        Ggm64MasterKey {
+            key: Ggm64Node::from(key),
+        }
     }
 
     pub fn new_from_slice(key: &[u8]) -> Ggm64MasterKey {
         assert!(key.len() >= GGM64_KEYSIZE);
 
-        Ggm64MasterKey { key: Ggm64Node::from_slice(&key[..GGM64_KEYSIZE]).clone() }
+        Ggm64MasterKey {
+            key: *Ggm64Node::from_slice(&key[..GGM64_KEYSIZE]),
+        }
     }
 
     pub fn evaluate(&self, input: u64) -> Ggm64Output {
@@ -235,7 +239,7 @@ impl<'a> GgmRCPrfIterator<'a> {
     fn next_in_one_tree(&mut self) -> Option<Ggm64Output> {
         while self.current.is_some() || !self.stack.is_empty() {
             while let Some(node) = self.current.as_mut() {
-                self.stack.push(node.clone());
+                self.stack.push(*node);
                 if node.0 == 64 {
                     self.current = None;
                 } else {

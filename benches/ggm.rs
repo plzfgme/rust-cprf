@@ -1,7 +1,7 @@
 use cprf::ggm::{Ggm64ConstrainedKey, Ggm64MasterKey};
 use criterion::{black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
-use rand::{rngs::OsRng, RngCore};
 use pprof::criterion::{Output, PProfProfiler};
+use rand::{rngs::OsRng, RngCore};
 
 fn get_ck(a: u64, b: u64) -> Ggm64ConstrainedKey {
     let mut key = [0u8; 16];
