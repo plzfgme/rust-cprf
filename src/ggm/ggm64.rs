@@ -6,8 +6,7 @@ use aes::{
 };
 use arrayvec::ArrayVec;
 use bitvec::prelude::*;
-use generic_array::{arr, typenum::U16, GenericArray};
-use lazy_static::lazy_static;
+use generic_array::{typenum::U16, GenericArray};
 use serde::{Deserialize, Serialize};
 
 /// Key size of Ggm64.
@@ -19,12 +18,12 @@ pub type Ggm64Key = [u8; GGM64_KEYSIZE];
 /// Output type of Ggm64's evaluation result.
 pub type Ggm64Output = [u8; GGM64_OUTPUTSIZE];
 
+const GGM64_NODESIZE: usize = 16;
+type Ggm64NodeArray = [u8; GGM64_NODESIZE];
 type Ggm64Node = GenericArray<u8, U16>; // GGM internal result
 
-lazy_static! {
-    static ref BLOCK0: GenericArray<u8, U16> = arr![u8; 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    static ref BLOCK1: GenericArray<u8, U16> = arr![u8; 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-}
+const BLOCK0: Ggm64NodeArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const BLOCK1: Ggm64NodeArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
 
 /// Master key of GGM range-constrained PRF, uses u64 as input.
 #[derive(Debug, Deserialize, Serialize)]
@@ -377,11 +376,15 @@ impl<'a> Iterator for Ggm64Iterator<'a> {
 
 #[inline(always)]
 fn step(node: &mut Ggm64Node, b: bool) {
+    // Uses AES-CTR DRBG
     let cipher = Aes128Enc::new(node);
 
+    let block0 = GenericArray::from_slice(&BLOCK0);
+    let block1 = GenericArray::from_slice(&BLOCK1);
+
     match b {
-        true => cipher.encrypt_block_b2b(&BLOCK1, node),
-        false => cipher.encrypt_block_b2b(&BLOCK0, node),
+        true => cipher.encrypt_block_b2b(block1, node),
+        false => cipher.encrypt_block_b2b(block0, node),
     }
 }
 
