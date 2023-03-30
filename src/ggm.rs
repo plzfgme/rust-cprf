@@ -9,9 +9,9 @@ use generic_array::{arr, typenum::U16, GenericArray};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
-type Node = GenericArray<u8, U16>;
-pub type Key = Node;
-pub type Output = Node;
+type Ggm64Node = GenericArray<u8, U16>;
+pub type Ggm64Key = Ggm64Node;
+pub type Ggm64Output = Ggm64Node;
 
 lazy_static! {
     static ref BLOCK0: GenericArray<u8, U16> = arr![u8; 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -19,16 +19,16 @@ lazy_static! {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct GgmRCPrfMasterKey {
-    key: Node,
+pub struct Ggm64MasterKey {
+    key: Ggm64Node,
 }
 
-impl GgmRCPrfMasterKey {
-    pub fn new(key: Key) -> GgmRCPrfMasterKey {
-        GgmRCPrfMasterKey { key }
+impl Ggm64MasterKey {
+    pub fn new(key: Ggm64Key) -> Ggm64MasterKey {
+        Ggm64MasterKey { key }
     }
 
-    pub fn evaluate(&self, input: u64) -> Output {
+    pub fn evaluate(&self, input: u64) -> Ggm64Output {
         let mut node = self.key;
 
         input
@@ -39,7 +39,7 @@ impl GgmRCPrfMasterKey {
         node
     }
 
-    pub fn constrained(&self, a: u64, b: u64) -> GgmRCPrfConstrainedKey {
+    pub fn constrain(&self, a: u64, b: u64) -> Ggm64ConstrainedKey {
         let (a_bits, b_bits) = (a.view_bits::<Msb0>(), b.view_bits::<Msb0>());
 
         let mut node_prefixs = VecDeque::with_capacity(2 * 64_usize);
@@ -63,7 +63,7 @@ impl GgmRCPrfMasterKey {
                 node_prefixs.push_front((t as u8, keep_first_n_bit_set_others_zero(a, t)));
                 nodes.push_front(a_node);
 
-                return GgmRCPrfConstrainedKey {
+                return Ggm64ConstrainedKey {
                     a,
                     b,
                     node_prefixs,
@@ -141,7 +141,7 @@ impl GgmRCPrfMasterKey {
             nodes.push_back(node);
         }
 
-        GgmRCPrfConstrainedKey {
+        Ggm64ConstrainedKey {
             a,
             b,
             node_prefixs,
@@ -151,19 +151,19 @@ impl GgmRCPrfMasterKey {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct GgmRCPrfConstrainedKey {
+pub struct Ggm64ConstrainedKey {
     a: u64,
     b: u64,
     node_prefixs: VecDeque<(u8, u64)>,
-    nodes: VecDeque<Node>,
+    nodes: VecDeque<Ggm64Node>,
 }
 
-impl GgmRCPrfConstrainedKey {
+impl Ggm64ConstrainedKey {
     pub fn get_range(&self) -> (u64, u64) {
         (self.a, self.b)
     }
 
-    pub fn evaluate(&self, input: u64) -> Option<Output> {
+    pub fn evaluate(&self, input: u64) -> Option<Ggm64Output> {
         let (prefix_length, mut node) = match self.search(input) {
             Some((l, n)) => (l as usize, n),
             None => return None,
@@ -187,7 +187,7 @@ impl GgmRCPrfConstrainedKey {
         }
     }
 
-    fn search(&self, target: u64) -> Option<(u8, Node)> {
+    fn search(&self, target: u64) -> Option<(u8, Ggm64Node)> {
         let (mut low, mut high) = (0, self.node_prefixs.len());
 
         if target < self.a || target > self.b {
@@ -216,14 +216,14 @@ impl GgmRCPrfConstrainedKey {
 }
 
 pub struct GgmRCPrfIterator<'a> {
-    ckey: &'a GgmRCPrfConstrainedKey,
+    ckey: &'a Ggm64ConstrainedKey,
     current_tree: usize,
-    stack: Vec<(u8, Node)>,
-    current: Option<(u8, Node)>,
+    stack: Vec<(u8, Ggm64Node)>,
+    current: Option<(u8, Ggm64Node)>,
 }
 
 impl<'a> GgmRCPrfIterator<'a> {
-    fn next_in_one_tree(&mut self) -> Option<Output> {
+    fn next_in_one_tree(&mut self) -> Option<Ggm64Output> {
         while self.current.is_some() || !self.stack.is_empty() {
             while let Some(mut node) = self.current {
                 self.stack.push(node);
@@ -252,7 +252,7 @@ impl<'a> GgmRCPrfIterator<'a> {
 }
 
 impl<'a> Iterator for GgmRCPrfIterator<'a> {
-    type Item = Output;
+    type Item = Ggm64Output;
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(output) = self.next_in_one_tree() {
@@ -277,7 +277,7 @@ impl<'a> Iterator for GgmRCPrfIterator<'a> {
 }
 
 #[inline(always)]
-fn step(node: &mut Node, b: bool) {
+fn step(node: &mut Ggm64Node, b: bool) {
     let cipher = Aes128Enc::new(node);
 
     match b {

@@ -1,15 +1,15 @@
-use cprf::ggm::{GgmRCPrfConstrainedKey, GgmRCPrfMasterKey};
+use cprf::ggm::{Ggm64ConstrainedKey, Ggm64MasterKey};
 use criterion::{black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
 use generic_array::GenericArray;
 use rand::{rngs::OsRng, RngCore};
 use pprof::criterion::{Output, PProfProfiler};
 
-fn get_ck(a: u64, b: u64) -> GgmRCPrfConstrainedKey {
+fn get_ck(a: u64, b: u64) -> Ggm64ConstrainedKey {
     let mut key = GenericArray::from([0u8; 16]);
     OsRng.fill_bytes(&mut key);
-    let mk = GgmRCPrfMasterKey::new(key);
+    let mk = Ggm64MasterKey::new(key);
 
-    mk.constrained(a, b)
+    mk.constrain(a, b)
 }
 
 fn bench_ggm_evaluate_all(c: &mut Criterion) {
