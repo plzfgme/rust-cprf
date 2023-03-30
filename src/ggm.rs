@@ -182,7 +182,7 @@ impl GgmRCPrfConstrainedKey {
         GgmRCPrfIterator {
             ckey: self,
             current_tree: 0,
-            stack: Vec::new(),
+            stack: Vec::with_capacity(64),
             current: Some((self.node_prefixs[0].0, self.nodes[0])),
         }
     }

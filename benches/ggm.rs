@@ -2,6 +2,7 @@ use cprf::ggm::{GgmRCPrfConstrainedKey, GgmRCPrfMasterKey};
 use criterion::{black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
 use generic_array::GenericArray;
 use rand::{rngs::OsRng, RngCore};
+use pprof::criterion::{Output, PProfProfiler};
 
 fn get_ck(a: u64, b: u64) -> GgmRCPrfConstrainedKey {
     let mut key = GenericArray::from([0u8; 16]);
@@ -13,7 +14,7 @@ fn get_ck(a: u64, b: u64) -> GgmRCPrfConstrainedKey {
 
 fn bench_ggm_evaluate_all(c: &mut Criterion) {
     let mut group = c.benchmark_group("GGM ck evaluate vs evaluate_all");
-    for i in (1000..=20000).step_by(1000) {
+    for i in (1000..=10000).step_by(1000) {
         group.bench_function(BenchmarkId::new("evalate for each", i), |b| {
             b.iter_batched(
                 || get_ck(2001, 2000 + i),
@@ -35,5 +36,9 @@ fn bench_ggm_evaluate_all(c: &mut Criterion) {
     }
 }
 
-criterion_group!(benches, bench_ggm_evaluate_all);
+criterion_group!(
+    name = benches;
+    config = Criterion::default().with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
+    targets = bench_ggm_evaluate_all
+);
 criterion_main!(benches);
