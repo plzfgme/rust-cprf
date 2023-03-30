@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 aes = "0.8.2"
+arrayvec = "0.7.2"
 bitvec = "1.0.1"
 generic-array = { version = "0.14.6", features = ["serde"] }
 lazy_static = "1.4.0"

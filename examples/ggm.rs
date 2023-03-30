@@ -1,9 +1,8 @@
 use cprf::ggm::Ggm64MasterKey;
-use generic_array::GenericArray;
 
 fn main() {
-    let key = GenericArray::from([0u8; 16]);
-    let mk = Ggm64MasterKey::new(key);
+    let key = [0u8; 16];
+    let mk = Ggm64MasterKey::new_from_slice(&key);
     let mk_output = mk.evaluate(2500);
 
     let ck = mk.constrain(2000, 3000);
