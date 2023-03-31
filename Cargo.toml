@@ -1,15 +1,23 @@
 [workspace]
-members = [
-    ".",
-    "./pycprf"
-]
+members = [".", "./pycprf"]
 
 [package]
 name = "cprf"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["plzfgme <plzfgme@gmail.com>"]
+description = "Constrained pseudo random function (PRF) in Rust"
+keywords = [
+    "cryptography",
+    "prf",
+    "pseudo random function",
+    "constrained prf",
+    "constrained pseudo random function",
+]
+categories = ["cryptography"]
+readme = "README.md"
+repository = "https://github.com/plzfgme/cprf"
+license = "MIT"
 
 [dependencies]
 aes = "0.8.2"
