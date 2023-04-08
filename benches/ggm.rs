@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use cprf::ggm::{Ggm64ConstrainedKey, Ggm64MasterKey};
 use criterion::{black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
 use pprof::criterion::{Output, PProfProfiler};
@@ -37,7 +39,7 @@ fn bench_ggm_evaluate_all(c: &mut Criterion) {
 
 criterion_group!(
     name = benches;
-    config = Criterion::default().with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
+    config = Criterion::default().measurement_time(Duration::new(25, 0)).with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
     targets = bench_ggm_evaluate_all
 );
 criterion_main!(benches);
