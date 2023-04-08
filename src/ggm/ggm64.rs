@@ -307,7 +307,7 @@ pub struct Ggm64Iterator<'a> {
     current_tree: usize,
 
     // Inorder traversal data structs.
-    stack: ArrayVec<(u8, Ggm64Node), 64>,
+    stack: ArrayVec<(u8, Ggm64Node), 65>,
     current: Option<(u8, Ggm64Node)>,
 }
 
