@@ -15,7 +15,7 @@ fn get_ck(a: u64, b: u64) -> Ggm64ConstrainedKey {
 
 fn bench_ggm_evaluate_all(c: &mut Criterion) {
     let mut group = c.benchmark_group("GGM ck evaluate vs evaluate_all");
-    for i in (1000..=10000).step_by(1000) {
+    for i in [1000, 2500, 5000, 7500, 10000].iter() {
         group.bench_function(BenchmarkId::new("evalate for each", i), |b| {
             b.iter_batched(
                 || get_ck(2001, 2000 + i),
@@ -39,7 +39,7 @@ fn bench_ggm_evaluate_all(c: &mut Criterion) {
 
 criterion_group!(
     name = benches;
-    config = Criterion::default().measurement_time(Duration::new(25, 0)).with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
+    config = Criterion::default().measurement_time(Duration::new(20, 0)).with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
     targets = bench_ggm_evaluate_all
 );
 criterion_main!(benches);
