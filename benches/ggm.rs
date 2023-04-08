@@ -39,7 +39,7 @@ fn bench_ggm_evaluate_all(c: &mut Criterion) {
 
 criterion_group!(
     name = benches;
-    config = Criterion::default().nresamples(200).measurement_time(Duration::new(20, 0)).with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
+    config = Criterion::default().sample_size(200).measurement_time(Duration::new(20, 0)).with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)));
     targets = bench_ggm_evaluate_all
 );
 criterion_main!(benches);
