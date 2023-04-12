@@ -3,7 +3,7 @@ members = [".", "./pycprf"]
 
 [package]
 name = "cprf"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["plzfgme <plzfgme@gmail.com>"]
 description = "Constrained pseudo random function (PRF) in Rust"
