@@ -137,7 +137,7 @@ impl Ggm64MasterKey {
             nodes.push_front(a_node);
         }
 
-        if b_bits[..t].all() {
+        if b_bits[t..].all() {
             node_prefixs.push_back(((t + 1) as u8, keep_first_n_bit_set_others_zero(b, t + 1)));
             step(&mut node, b_bits[t]);
             nodes.push_back(node);
@@ -439,11 +439,11 @@ mod tests {
         let key = [0u8; GGM64_KEYSIZE];
         let mk = Ggm64MasterKey::new_from_slice(&key);
         let mut mk_outputs = Vec::with_capacity(21);
-        for input in 200..=220 {
+        for input in 2700..=2720 {
             mk_outputs.push(mk.evaluate(input));
         }
 
-        let ck = mk.constrain(200, 220);
+        let ck = mk.constrain(2700, 2720);
         let ck_outputs: Vec<Ggm64Output> = ck.evaluate_all().collect();
 
         assert_eq!(mk_outputs, ck_outputs)
