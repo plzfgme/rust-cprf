@@ -10,7 +10,7 @@ description = "Constrained pseudo random function (PRF) in Rust"
 keywords = ["cryptography", "prf", "constrained", "constrained_prf"]
 categories = ["cryptography"]
 readme = "README.md"
-repository = "https://github.com/plzfgme/cprf"
+repository = "https://github.com/plzfgme/rust-cprf"
 license = "MIT"
 
 [dependencies]
